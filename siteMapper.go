@@ -10,10 +10,12 @@ import (
 	"io"
 	"encoding/xml"
 	"os"
+	"log"
 )
 
 var inputUrl = flag.String("url", "https://www.google.com", "The root of the domain to map")
 var maxDepth = flag.Int("depth", 2, "The maximum amount of links to follow")
+var outputFile = flag.String("o", "", "The file to write output to")
 
 // datatype for creating <loc></loc> tags in xml output
 
@@ -31,9 +33,6 @@ type urlset struct {
 func main() {
 	flag.Parse()
 	
-	enc := xml.NewEncoder(os.Stdout)
-	enc.Indent("  ", "    ")
-
 	links := bfs(*inputUrl, *maxDepth)
 	
 	toXml := urlset{
@@ -44,10 +43,26 @@ func main() {
 		toXml.Urls = append(toXml.Urls, loc{Loc:link})
 	}
 	
+	enc := getEncoder()
+	enc.Indent("  ", "    ")
+
 	if err := enc.Encode(toXml); err != nil{
 		fmt.Println("Error when encoding to xml", err)
 	}
 	fmt.Println()
+}
+
+// Function returns creates an encoder with either the user specified file or os.Stdout
+
+func getEncoder() *xml.Encoder {
+	if *outputFile != ""{
+		f, err := os.Create(*outputFile)
+		if err != nil{
+			log.Fatalf("Error creating file: %v", err)
+		}
+		return xml.NewEncoder(f)
+	}
+	return xml.NewEncoder(os.Stdout)
 }
 
 // Function performs a breadth-first-search on all local links found in website
