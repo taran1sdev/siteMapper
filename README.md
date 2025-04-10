@@ -1,6 +1,6 @@
 # siteMapper
 
-This application uses the link module in /htmlLinkParser. It takes a url as input, performs a GET request on the url, extracts all the <a> tags from html response and filters those to only include links within the same domain.
+This application uses the link module in /htmlLinkParser. It takes a url as input, performs a GET request on the url, extracts all the `<a>` tags from html response and filters those to only include links within the same domain.
 
 The application then performs a breadth-first-search of the local links found on the domain - the user can specify the depth of this search.
 
